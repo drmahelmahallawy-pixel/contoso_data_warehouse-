@@ -1,0 +1,517 @@
+-- ==========================================
+-- Product Data Profiling
+-- ==========================================
+
+-- 0. Sample Data
+select *
+from bronze.product
+limit 10;
+
+
+-- 1. Row Count
+select count(*) as row_count
+from bronze.product;
+
+
+-- 2. Duplicate Keys
+select
+    productkey,
+    count(*) as product_count
+from bronze.product
+group by productkey
+having count(*) > 1;
+
+
+-- 3. NULL Analysis
+select
+    count(*) filter (where productkey is null)  as productkey_nulls,
+    count(*) filter (where productcode is null) as productcode_nulls,
+    count(*) filter (where productname is null) as productname_nulls
+from bronze.product;
+
+
+-- 4. Blank Values
+select
+    count(*) filter (where productcode = '') as blank_productcode,
+    count(*) filter (where productname = '') as blank_productname,
+    count(*) filter (where trim(productcode) = '') as whitespace_productcode,
+    count(*) filter (where trim(productname) = '') as whitespace_productname
+from bronze.product;
+
+
+-- 5. Negative Values
+select
+    count(*) filter (where productkey < 0) as negative_productkey
+from bronze.product;
+
+
+-- 6. Zero Values
+select
+    count(*) filter (where productkey = 0) as zero_productkey
+from bronze.product;
+
+
+-- 7. Distinct Values
+select
+    count(distinct productkey)  as distinct_productkey,
+    count(distinct productcode) as distinct_productcode,
+    count(distinct productname) as distinct_productname
+from bronze.product;
+
+
+-- 8. Min / Max
+select
+    min(productkey) as min_productkey,
+    max(productkey) as max_productkey
+from bronze.product;
+
+
+-- 9. Data Types
+select
+    column_name,
+    data_type
+from information_schema.columns
+where table_schema = 'bronze'
+  and table_name = 'product'
+order by ordinal_position;
+------------------
+select
+    table_name
+from information_schema.tables
+where table_schema = 'bronze'
+  and table_type = 'BASE TABLE'
+order by table_name;
+---------------------
+-- =========================================================
+-- BRONZE LAYER - DATA PROFILING
+-- Tables:
+-- currencyexchange
+-- customer
+-- date
+-- product
+-- sales
+-- store
+-- =========================================================
+
+
+-- =========================================================
+-- 1. PRODUCT
+-- =========================================================
+
+-- Sample
+select *
+from bronze.product
+limit 10;
+
+-- Row Count
+select count(*) as row_count
+from bronze.product;
+
+-- Duplicate Keys
+select
+    productkey,
+    count(*) as record_count
+from bronze.product
+group by productkey
+having count(*) > 1;
+
+-- NULL Analysis
+select
+    count(*) filter (where productkey is null) as productkey_nulls,
+    count(*) filter (where productcode is null) as productcode_nulls,
+    count(*) filter (where productname is null) as productname_nulls
+from bronze.product;
+
+-- Blank Values
+select
+    count(*) filter (where productcode = '') as blank_productcode,
+    count(*) filter (where productname = '') as blank_productname,
+    count(*) filter (where trim(productcode) = '') as whitespace_productcode,
+    count(*) filter (where trim(productname) = '') as whitespace_productname
+from bronze.product;
+
+-- Negative Values
+select
+    count(*) filter (where productkey < 0) as negative_productkey
+from bronze.product;
+
+-- Zero Values
+select
+    count(*) filter (where productkey = 0) as zero_productkey
+from bronze.product;
+
+-- Distinct Values
+select
+    count(distinct productkey) as distinct_productkey,
+    count(distinct productcode) as distinct_productcode,
+    count(distinct productname) as distinct_productname
+from bronze.product;
+
+-- Min / Max
+select
+    min(productkey) as min_productkey,
+    max(productkey) as max_productkey
+from bronze.product;
+
+-- Data Types
+select
+    column_name,
+    data_type
+from information_schema.columns
+where table_schema = 'bronze'
+  and table_name = 'product'
+order by ordinal_position;
+
+
+
+-- =========================================================
+-- 2. CUSTOMER
+-- =========================================================
+
+-- Sample
+select *
+from bronze.customer
+limit 10;
+
+-- Row Count
+select count(*) as row_count
+from bronze.customer;
+
+-- Duplicate Keys
+select
+    customerkey,
+    count(*) as record_count
+from bronze.customer
+group by customerkey
+having count(*) > 1;
+
+-- NULL Analysis
+select
+    count(*) filter (where customerkey is null) as customerkey_nulls,
+    count(*) filter (where firstname is null) as firstname_nulls,
+    count(*) filter (where lastname is null) as lastname_nulls
+from bronze.customer;
+
+-- Blank Values
+select
+    count(*) filter (where trim(coalesce(firstname, '')) = '') as blank_firstname,
+    count(*) filter (where trim(coalesce(lastname, '')) = '') as blank_lastname
+from bronze.customer;
+
+-- Negative Values
+select
+    count(*) filter (where customerkey < 0) as negative_customerkey
+from bronze.customer;
+
+-- Zero Values
+select
+    count(*) filter (where customerkey = 0) as zero_customerkey
+from bronze.customer;
+
+-- Distinct Values
+select
+    count(distinct customerkey) as distinct_customerkey,
+    count(distinct firstname) as distinct_firstname,
+    count(distinct lastname) as distinct_lastname
+from bronze.customer;
+
+-- Min / Max
+select
+    min(customerkey) as min_customerkey,
+    max(customerkey) as max_customerkey
+from bronze.customer;
+
+-- Data Types
+select
+    column_name,
+    data_type
+from information_schema.columns
+where table_schema = 'bronze'
+  and table_name = 'customer'
+order by ordinal_position;
+
+
+
+-- =========================================================
+-- 3. DATE
+-- =========================================================
+
+-- Sample
+select *
+from bronze.date
+limit 10;
+
+-- Row Count
+select count(*) as row_count
+from bronze.date;
+
+-- Duplicate Keys
+select
+    datekey,
+    count(*) as record_count
+from bronze.date
+group by datekey
+having count(*) > 1;
+
+-- NULL Analysis
+select
+    count(*) filter (where datekey is null) as datekey_nulls,
+    count(*) filter (where date is null) as date_nulls
+from bronze.date;
+
+-- Blank Values
+select
+    count(*) filter (where trim(coalesce(cast(datekey as text), '')) = '') as blank_datekey
+from bronze.date;
+
+-- Negative Values
+select
+    count(*) filter (where datekey < 0) as negative_datekey
+from bronze.date;
+
+-- Zero Values
+select
+    count(*) filter (where datekey = 0) as zero_datekey
+from bronze.date;
+
+-- Distinct Values
+select
+    count(distinct datekey) as distinct_datekey,
+    count(distinct date) as distinct_date
+from bronze.date;
+
+-- Min / Max
+select
+    min(datekey) as min_datekey,
+    max(datekey) as max_datekey,
+    min(date) as min_date,
+    max(date) as max_date
+from bronze.date;
+
+-- Data Types
+select
+    column_name,
+    data_type
+from information_schema.columns
+where table_schema = 'bronze'
+  and table_name = 'date'
+order by ordinal_position;
+
+
+
+-- =========================================================
+-- 4. SALES
+-- =========================================================
+
+-- Sample
+select *
+from bronze.sales
+limit 10;
+
+-- Row Count
+select count(*) as row_count
+from bronze.sales;
+
+-- Duplicate Keys
+select
+    saleskey,
+    count(*) as record_count
+from bronze.sales
+group by saleskey
+having count(*) > 1;
+
+-- NULL Analysis
+select
+    count(*) filter (where saleskey is null) as saleskey_nulls,
+    count(*) filter (where productkey is null) as productkey_nulls,
+    count(*) filter (where customerkey is null) as customerkey_nulls,
+    count(*) filter (where storekey is null) as storekey_nulls,
+    count(*) filter (where orderdate is null) as orderdate_nulls,
+    count(*) filter (where quantity is null) as quantity_nulls,
+    count(*) filter (where unitprice is null) as unitprice_nulls
+from bronze.sales;
+
+-- Negative Values
+select
+    count(*) filter (where quantity < 0) as negative_quantity,
+    count(*) filter (where unitprice < 0) as negative_unitprice
+from bronze.sales;
+
+-- Zero Values
+select
+    count(*) filter (where quantity = 0) as zero_quantity,
+    count(*) filter (where unitprice = 0) as zero_unitprice
+from bronze.sales;
+
+-- Distinct Values
+select
+    count(distinct saleskey) as distinct_saleskey,
+    count(distinct productkey) as distinct_productkey,
+    count(distinct customerkey) as distinct_customerkey,
+    count(distinct storekey) as distinct_storekey,
+    count(distinct orderdate) as distinct_orderdate
+from bronze.sales;
+
+-- Min / Max
+select
+    min(quantity) as min_quantity,
+    max(quantity) as max_quantity,
+    min(unitprice) as min_unitprice,
+    max(unitprice) as max_unitprice,
+    min(orderdate) as min_orderdate,
+    max(orderdate) as max_orderdate
+from bronze.sales;
+
+-- Data Types
+select
+    column_name,
+    data_type
+from information_schema.columns
+where table_schema = 'bronze'
+  and table_name = 'sales'
+order by ordinal_position;
+
+
+
+-- =========================================================
+-- 5. STORE
+-- =========================================================
+
+-- Sample
+select *
+from bronze.store
+limit 10;
+
+-- Row Count
+select count(*) as row_count
+from bronze.store;
+
+-- Duplicate Keys
+select
+    storekey,
+    count(*) as record_count
+from bronze.store
+group by storekey
+having count(*) > 1;
+
+-- NULL Analysis
+select
+    count(*) filter (where storekey is null) as storekey_nulls,
+    count(*) filter (where storecode is null) as storecode_nulls,
+    count(*) filter (where storename is null) as storename_nulls
+from bronze.store;
+
+-- Blank Values
+select
+    count(*) filter (where trim(coalesce(storecode, '')) = '') as blank_storecode,
+    count(*) filter (where trim(coalesce(storename, '')) = '') as blank_storename
+from bronze.store;
+
+-- Negative Values
+select
+    count(*) filter (where storekey < 0) as negative_storekey
+from bronze.store;
+
+-- Zero Values
+select
+    count(*) filter (where storekey = 0) as zero_storekey
+from bronze.store;
+
+-- Distinct Values
+select
+    count(distinct storekey) as distinct_storekey,
+    count(distinct storecode) as distinct_storecode,
+    count(distinct storename) as distinct_storename
+from bronze.store;
+
+-- Min / Max
+select
+    min(storekey) as min_storekey,
+    max(storekey) as max_storekey
+from bronze.store;
+
+-- Data Types
+select
+    column_name,
+    data_type
+from information_schema.columns
+where table_schema = 'bronze'
+  and table_name = 'store'
+order by ordinal_position;
+
+
+
+-- =========================================================
+-- 6. CURRENCY EXCHANGE
+-- =========================================================
+
+-- Sample
+select *
+from bronze.currencyexchange
+limit 10;
+
+-- Row Count
+select count(*) as row_count
+from bronze.currencyexchange;
+
+-- Duplicate Keys
+select
+    "date",
+    fromcurrency,
+    tocurrency,
+    count(*) as record_count
+from bronze.currencyexchange
+group by
+    "date",
+    fromcurrency,
+    tocurrency
+having count(*) > 1;
+
+-- NULL Analysis
+select
+    count(*) filter (where "date" is null) as date_nulls,
+    count(*) filter (where fromcurrency is null) as fromcurrency_nulls,
+    count(*) filter (where tocurrency is null) as tocurrency_nulls,
+    count(*) filter (where exchange is null) as exchange_nulls
+from bronze.currencyexchange;
+
+-- Blank Values
+select
+    count(*) filter (where trim(coalesce(fromcurrency, '')) = '') as blank_fromcurrency,
+    count(*) filter (where trim(coalesce(tocurrency, '')) = '') as blank_tocurrency
+from bronze.currencyexchange;
+
+-- Negative Values
+select
+    count(*) filter (where exchange < 0) as negative_exchange
+from bronze.currencyexchange;
+
+-- Zero Values
+select
+    count(*) filter (where exchange = 0) as zero_exchange
+from bronze.currencyexchange;
+
+-- Distinct Values
+select
+    count(distinct "date") as distinct_date,
+    count(distinct fromcurrency) as distinct_fromcurrency,
+    count(distinct tocurrency) as distinct_tocurrency,
+    count(distinct exchange) as distinct_exchange
+from bronze.currencyexchange;
+
+-- Min / Max
+select
+    min("date") as min_date,
+    max("date") as max_date,
+    min(exchange) as min_exchange,
+    max(exchange) as max_exchange
+from bronze.currencyexchange;
+
+-- Data Types
+select
+    column_name,
+    data_type
+from information_schema.columns
+where table_schema = 'bronze'
+  and table_name = 'currencyexchange'
+order by ordinal_position;
