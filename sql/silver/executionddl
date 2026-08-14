@@ -1,0 +1,220 @@
+-- =========================================================
+-- SILVER LAYER - SALES
+-- =========================================================
+
+create schema if not exists silver;
+
+do $$
+declare
+    start_time timestamp;
+    end_time timestamp;
+begin
+
+    start_time := clock_timestamp();
+
+    raise notice '============================================';
+    raise notice 'Silver.sales load started at: %', start_time;
+    raise notice '============================================';
+
+    -- Recreate Silver Table
+    drop table if exists silver.sales;
+
+    create table silver.sales as
+    select
+        orderkey,
+        linenumber,
+        orderdate,
+        deliverydate,
+        customerkey,
+        storekey,
+        productkey,
+        quantity,
+        unitprice,
+        netprice,
+        unitcost,
+        currencycode,
+        exchangerate,
+
+        -- Derived Metrics
+        quantity * netprice as revenue,
+        quantity * unitcost as total_cost
+
+    from bronze.sales;
+
+    end_time := clock_timestamp();
+
+    raise notice '============================================';
+    raise notice 'Silver.sales load completed at: %', end_time;
+    raise notice 'Execution time: % seconds',
+        extract(epoch from (end_time - start_time));
+    raise notice '============================================';
+
+end $$;
+-- =========================================================
+-- SILVER LAYER
+-- CREATE REMAINING TABLES
+-- =========================================================
+
+create schema if not exists silver;
+
+
+-- =========================================================
+-- 1. CUSTOMER
+-- =========================================================
+
+do $$
+declare
+    start_time timestamp;
+    end_time timestamp;
+begin
+
+    start_time := clock_timestamp();
+
+    raise notice '============================================';
+    raise notice 'Silver.customer load started at: %', start_time;
+    raise notice '============================================';
+
+    drop table if exists silver.customer;
+
+    create table silver.customer as
+    select *
+    from bronze.customer;
+
+    end_time := clock_timestamp();
+
+    raise notice 'Silver.customer load completed at: %', end_time;
+    raise notice 'Execution time: % seconds',
+        extract(epoch from (end_time - start_time));
+    raise notice '============================================';
+
+end $$;
+
+
+-- =========================================================
+-- 2. DATE
+-- =========================================================
+
+do $$
+declare
+    start_time timestamp;
+    end_time timestamp;
+begin
+
+    start_time := clock_timestamp();
+
+    raise notice '============================================';
+    raise notice 'Silver.date load started at: %', start_time;
+    raise notice '============================================';
+
+    drop table if exists silver.date;
+
+    create table silver.date as
+    select *
+    from bronze.date;
+
+    end_time := clock_timestamp();
+
+    raise notice 'Silver.date load completed at: %', end_time;
+    raise notice 'Execution time: % seconds',
+        extract(epoch from (end_time - start_time));
+    raise notice '============================================';
+
+end $$;
+
+
+-- =========================================================
+-- 3. PRODUCT
+-- =========================================================
+
+do $$
+declare
+    start_time timestamp;
+    end_time timestamp;
+begin
+
+    start_time := clock_timestamp();
+
+    raise notice '============================================';
+    raise notice 'Silver.product load started at: %', start_time;
+    raise notice '============================================';
+
+    drop table if exists silver.product;
+
+    create table silver.product as
+    select *
+    from bronze.product;
+
+    end_time := clock_timestamp();
+
+    raise notice 'Silver.product load completed at: %', end_time;
+    raise notice 'Execution time: % seconds',
+        extract(epoch from (end_time - start_time));
+    raise notice '============================================';
+
+end $$;
+
+
+-- =========================================================
+-- 4. STORE
+-- =========================================================
+
+do $$
+declare
+    start_time timestamp;
+    end_time timestamp;
+begin
+
+    start_time := clock_timestamp();
+
+    raise notice '============================================';
+    raise notice 'Silver.store load started at: %', start_time;
+    raise notice '============================================';
+
+    drop table if exists silver.store;
+
+    create table silver.store as
+    select *
+    from bronze.store;
+
+    end_time := clock_timestamp();
+
+    raise notice 'Silver.store load completed at: %', end_time;
+    raise notice 'Execution time: % seconds',
+        extract(epoch from (end_time - start_time));
+    raise notice '============================================';
+
+end $$;
+
+
+-- =========================================================
+-- 5. CURRENCY EXCHANGE
+-- =========================================================
+
+do $$
+declare
+    start_time timestamp;
+    end_time timestamp;
+begin
+
+    start_time := clock_timestamp();
+
+    raise notice '============================================';
+    raise notice 'Silver.currencyexchange load started at: %',
+        start_time;
+    raise notice '============================================';
+
+    drop table if exists silver.currencyexchange;
+
+    create table silver.currencyexchange as
+    select *
+    from bronze.currencyexchange;
+
+    end_time := clock_timestamp();
+
+    raise notice 'Silver.currencyexchange load completed at: %',
+        end_time;
+    raise notice 'Execution time: % seconds',
+        extract(epoch from (end_time - start_time));
+    raise notice '============================================';
+
+end $$;
