@@ -1,0 +1,172 @@
+-- =========================================================
+-- BRONZE vs SILVER
+-- DATA VALIDATION
+-- =========================================================
+
+do $$
+declare
+    start_time timestamp;
+    end_time timestamp;
+
+    bronze_count bigint;
+    silver_count bigint;
+
+begin
+
+    start_time := clock_timestamp();
+
+    raise notice '================================================';
+    raise notice 'BRONZE vs SILVER VALIDATION STARTED: %', start_time;
+    raise notice '================================================';
+
+
+    -- =====================================================
+    -- 1. CUSTOMER
+    -- =====================================================
+
+    select count(*) into bronze_count
+    from bronze.customer;
+
+    select count(*) into silver_count
+    from silver.customer;
+
+    raise notice 'CUSTOMER | Bronze: % | Silver: % | Status: %',
+        bronze_count,
+        silver_count,
+        case
+            when bronze_count = silver_count then 'PASS'
+            else 'FAIL'
+        end;
+
+
+    -- =====================================================
+    -- 2. DATE
+    -- =====================================================
+
+    select count(*) into bronze_count
+    from bronze.date;
+
+    select count(*) into silver_count
+    from silver.date;
+
+    raise notice 'DATE | Bronze: % | Silver: % | Status: %',
+        bronze_count,
+        silver_count,
+        case
+            when bronze_count = silver_count then 'PASS'
+            else 'FAIL'
+        end;
+
+
+    -- =====================================================
+    -- 3. PRODUCT
+    -- =====================================================
+
+    select count(*) into bronze_count
+    from bronze.product;
+
+    select count(*) into silver_count
+    from silver.product;
+
+    raise notice 'PRODUCT | Bronze: % | Silver: % | Status: %',
+        bronze_count,
+        silver_count,
+        case
+            when bronze_count = silver_count then 'PASS'
+            else 'FAIL'
+        end;
+
+
+    -- =====================================================
+    -- 4. STORE
+    -- =====================================================
+
+    select count(*) into bronze_count
+    from bronze.store;
+
+    select count(*) into silver_count
+    from silver.store;
+
+    raise notice 'STORE | Bronze: % | Silver: % | Status: %',
+        bronze_count,
+        silver_count,
+        case
+            when bronze_count = silver_count then 'PASS'
+            else 'FAIL'
+        end;
+
+
+    -- =====================================================
+    -- 5. CURRENCY EXCHANGE
+    -- =====================================================
+
+    select count(*) into bronze_count
+    from bronze.currencyexchange;
+
+    select count(*) into silver_count
+    from silver.currencyexchange;
+
+    raise notice 'CURRENCYEXCHANGE | Bronze: % | Silver: % | Status: %',
+        bronze_count,
+        silver_count,
+        case
+            when bronze_count = silver_count then 'PASS'
+            else 'FAIL'
+        end;
+
+
+    -- =====================================================
+    -- 6. SALES
+    -- =====================================================
+
+    select count(*) into bronze_count
+    from bronze.sales;
+
+    select count(*) into silver_count
+    from silver.sales;
+
+    raise notice 'SALES | Bronze: % | Silver: % | Status: %',
+        bronze_count,
+        silver_count,
+        case
+            when bronze_count = silver_count then 'PASS'
+            else 'FAIL'
+        end;
+
+
+    -- =====================================================
+    -- 7. SALES - REVENUE & COST VALIDATION
+    -- =====================================================
+
+    if exists (
+        select 1
+        from silver.sales
+        where revenue is null
+           or total_cost is null
+    ) then
+
+        raise notice 'SALES METRICS | Revenue / Total Cost | Status: FAIL';
+
+    else
+
+        raise notice 'SALES METRICS | Revenue / Total Cost | Status: PASS';
+
+    end if;
+
+
+    -- =====================================================
+    -- END TIME
+    -- =====================================================
+
+    end_time := clock_timestamp();
+
+    raise notice '================================================';
+    raise notice 'BRONZE vs SILVER VALIDATION COMPLETED: %',
+        end_time;
+
+    raise notice 'Execution time: % seconds',
+        extract(epoch from (end_time - start_time));
+
+    raise notice '================================================';
+
+end $$;
