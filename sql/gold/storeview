@@ -1,0 +1,47 @@
+-- =========================================================
+-- GOLD LAYER - DIM STORE VIEW
+-- =========================================================
+
+create schema if not exists gold;
+
+do $$
+declare
+    start_time timestamp;
+    end_time timestamp;
+begin
+
+    start_time := clock_timestamp();
+
+    raise notice '================================================';
+    raise notice 'Gold.dim_store creation started at: %',
+        start_time;
+    raise notice '================================================';
+
+    drop view if exists gold.dim_store;
+
+    create view gold.dim_store as
+    select
+        storekey,
+        storecode,
+        geoareakey,
+        countrycode,
+        countryname,
+        state,
+        opendate,
+        closedate,
+        description,
+        squaremeters,
+        status
+    from silver.store;
+
+    end_time := clock_timestamp();
+
+    raise notice 'Gold.dim_store view created at: %',
+        end_time;
+
+    raise notice 'Execution time: % seconds',
+        extract(epoch from (end_time - start_time));
+
+    raise notice '================================================';
+
+end $$;
