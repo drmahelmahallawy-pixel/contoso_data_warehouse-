@@ -1,0 +1,61 @@
+create schema if not exists gold;
+do $$
+declare
+    start_time timestamp;
+    end_time timestamp;
+begin
+    start_time := clock_timestamp();
+    raise notice '================================================';
+    raise notice 'Gold.fact_sales load started at: %', start_time;
+    raise notice '================================================';
+
+    drop table if exists gold.fact_sales;
+
+    create table gold.fact_sales as
+select
+    s.orderkey,
+    s.linenumber,
+    s.orderdate,
+    s.deliverydate,
+    s.customerkey,
+    s.storekey,
+    case when s.storekey = 999999 then 'online'
+    	else 'instore'
+    end as salse_type,
+    s.productkey,
+    s.quantity,
+    s.unitprice,
+    s.netprice,
+    s.unitcost,
+    s.currencycode,
+    ce.exchange as usd_exchange,
+    -- Original Currency
+    s.revenue,
+    s.total_cost,
+    -- USD
+    s.revenue * ce.exchange as revenue_usd,
+    s.total_cost * ce.exchange as total_cost_usd,
+    -- Profit USD
+    (s.revenue - s.total_cost) * ce.exchange as profit_usd,
+  -- Profit Margin
+    case
+        when s.revenue <> 0
+        then (s.revenue - s.total_cost) / s.revenue
+        else 0
+    end as profit_margin,
+    -- Discount USD
+    s.quantity * (s.unitprice - s.netprice) * ce.exchange
+        as discount_amount_usd
+from silver.sales s
+left join silver.currencyexchange ce
+    on ce.date = s.orderdate
+   and ce.tocurrency = 'USD'
+   and ce.fromcurrency = s.currencycode;
+end_time := clock_timestamp();
+raise notice '================================================';
+raise notice 'Gold.fact_sales load completed at: %', end_time;
+raise notice 'Execution time: % seconds',
+extract(epoch from (end_time - start_time));
+raise notice '================================================';
+
+end $$;
