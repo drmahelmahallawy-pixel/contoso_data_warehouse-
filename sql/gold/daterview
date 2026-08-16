@@ -1,0 +1,36 @@
+-- =========================================================
+-- GOLD LAYER - DIM DATE VIEW
+-- =========================================================
+
+create schema if not exists gold;
+
+do $$
+declare
+    start_time timestamp;
+    end_time timestamp;
+begin
+
+    start_time := clock_timestamp();
+
+    raise notice '================================================';
+    raise notice 'Gold.dim_date creation started at: %',
+        start_time;
+    raise notice '================================================';
+
+    drop view if exists gold.dim_date;
+
+    create view gold.dim_date as
+    select *
+    from bronze.date;
+
+    end_time := clock_timestamp();
+
+    raise notice 'Gold.dim_date view created at: %',
+        end_time;
+
+    raise notice 'Execution time: % seconds',
+        extract(epoch from (end_time - start_time));
+
+    raise notice '================================================';
+
+end $$;
