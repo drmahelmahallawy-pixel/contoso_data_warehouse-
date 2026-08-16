@@ -1,0 +1,47 @@
+-- =========================================================
+-- GOLD LAYER - DIM CUSTOMER VIEW
+-- =========================================================
+
+create schema if not exists gold;
+
+do $$
+declare
+    start_time timestamp;
+    end_time timestamp;
+begin
+
+    start_time := clock_timestamp();
+
+    raise notice '================================================';
+    raise notice 'Gold.dim_customer creation started at: %',
+        start_time;
+    raise notice '================================================';
+
+    drop view if exists gold.dim_customer;
+
+    create view gold.dim_customer as
+    select
+        customerkey,
+        geoareakey,
+        startdt,
+        enddt,
+        continent,
+        gender,
+        country,
+        state,
+        city,
+        age,
+        occupation
+    from silver.customer;
+
+    end_time := clock_timestamp();
+
+    raise notice 'Gold.dim_customer view created at: %',
+        end_time;
+
+    raise notice 'Execution time: % seconds',
+        extract(epoch from (end_time - start_time));
+
+    raise notice '================================================';
+
+end $$;
